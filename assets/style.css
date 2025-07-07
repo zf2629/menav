@@ -473,27 +473,30 @@ body.loaded .layout {
 }
 
 .sidebar.collapsed .nav-item {
-    padding: 0.6rem 0;
+    padding: 0;
     justify-content: center;
-    width: 90%;
+    width: 40px; /* 设置固定宽度 */
+    height: 40px; /* 设置与宽度相等的高度 */
     text-align: center;
     margin-left: auto;
     margin-right: auto;
-    /* 调整宽度确保不出现水平滚动条 */
-    max-width: calc(var(--sidebar-collapsed-width) - 6px);
+    border-radius: 8px; /* 保持圆角 */
+    display: flex;
+    align-items: center;
     box-sizing: border-box;
 }
 
 .sidebar.collapsed .nav-item i {
     font-size: 1.25rem;
     width: auto;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
 }
 
 .sidebar.collapsed .nav-item .icon-container {
-    margin-right: 0;
-    width: auto; /* 移除固定宽度限制 */
+    margin: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1333,6 +1336,19 @@ body .content.expanded {
     .scroll-progress {
         height: 4px; /* 移动端略粗一些 */
     }
+
+    .sidebar .submenu {
+        margin-left: 1rem;
+    }
+    
+    .sidebar.active .submenu-item {
+        padding: 0.5rem 0.6rem;
+    }
+    
+    /* 确保移动设备上子菜单不会出现漏出问题 */
+    .sidebar.collapsed .submenu {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1616,10 +1632,12 @@ body .content.expanded {
     color: var(--text-bright);
 }
 
-/* 侧边栏折叠状态下子菜单样式 */
+/* 侧边栏折叠状态下子菜单样式 
+   通过精确控制子菜单的位置和显示方式，确保在侧边栏折叠状态下子菜单不会漏出
+   使用display: none确保完全隐藏，避免任何可能的视觉问题 */
 .sidebar.collapsed .submenu {
     position: absolute;
-    left: 100%;
+    left: var(--sidebar-collapsed-width); /* 使用变量确保与侧边栏宽度一致 */
     top: 0;
     background-color: var(--sidebar-bg);
     border-radius: 0 8px 8px 0;
@@ -1631,14 +1649,42 @@ body .content.expanded {
     max-height: 0;
     overflow: hidden;
     z-index: 200;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    display: none; /* 添加 display: none 确保完全隐藏 */
 }
 
+/* 确保子菜单项在悬停时不会漏出 
+   控制子菜单项的文本溢出行为，确保内容不会超出容器范围 */
+.sidebar.collapsed .submenu-item {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 确保子菜单容器在悬停时不会漏出 
+   使用static定位是为了让子菜单相对于侧边栏定位，而不是相对于nav-item-wrapper，
+   这样可以避免子菜单在折叠状态下漏出的问题 */
+.sidebar.collapsed .nav-item-wrapper {
+    position: static; /* 改为static，防止子菜单定位问题 */
+}
+
+/* 修改子菜单在悬停时的显示位置 
+   当用户悬停在导航项上时，显示子菜单，并确保其位置正确
+   使用绝对定位确保子菜单相对于侧边栏定位，避免在不同滚动位置出现问题 */
 .sidebar.collapsed .nav-item-wrapper:hover .submenu {
-    max-height: 300px; /* 设置合理的最大高度 */
-    overflow-y: scroll; /* 改为scroll */
+    max-height: 300px;
+    overflow-y: scroll;
     opacity: 1;
     visibility: visible;
-    scrollbar-width: none; /* Firefox隐藏滚动条 */
+    scrollbar-width: none;
+    pointer-events: auto;
+    display: block;
+    left: var(--sidebar-collapsed-width); /* 确保与侧边栏宽度一致 */
+    top: 0; /* 确保从顶部开始 */
+    position: absolute; /* 使用绝对定位，更符合文档流 */
 }
 
 /* 为WebKit浏览器隐藏滚动条 */
@@ -1658,6 +1704,11 @@ body .content.expanded {
     
     .sidebar.active .submenu-item {
         padding: 0.5rem 0.6rem;
+    }
+    
+    /* 确保移动设备上子菜单不会出现漏出问题 */
+    .sidebar.collapsed .submenu {
+        display: none;
     }
 }
 
